@@ -353,3 +353,52 @@ response.setHeader(
   })
 );
 ```
+
+server-side-rendering using the protected api
+
+```ts
+import { NextPageContext } from "next";
+// instead of Router from "next/router, the documentation demands SingleRouter for server-side
+import SingleRouter from "next/router";
+
+const People = ({ people }) => {
+  return <div>Hello People! {JSON.stringify(people)}</div>;
+};
+
+// a router middleware to reroute if you not logged in
+const myFetchHelper = async (url: string, context: NextPageContext) => {
+  // getting the cookies send from the client side
+  const cookie = context.req.headers?.cookie;
+  // forwarding client header to the api-route and fetch the requested data
+  const resp = await fetch(url, {
+    headers: {
+      cookie: cookie,
+    },
+  });
+
+  // if there is no cookie, you will reroute to the login page (client side)
+  if (resp.status === 401 && !context.req) {
+    SingleRouter.replace("/login");
+    return;
+  }
+
+  // if there is not cookie, you will rerouted to the login page (server-side)
+  if (resp.status === 401 && context.req) {
+    context.res?.writeHead(302, {
+      Location: "http://localhost:3000/login",
+    });
+    context.res.end();
+    return;
+  }
+
+  const json = await resp.json();
+  return json;
+};
+
+People.getInitialProps = async (context: NextPageContext) => {
+  const json = await myFetchHelper("http://localhost:3000/api/people", context);
+  return { people: json };
+};
+
+export default People;
+```
