@@ -15,9 +15,11 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@types/sqlite3": "^3.1.7",
     "next": "10.0.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "sqlite": "^4.0.19",
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
