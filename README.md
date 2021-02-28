@@ -298,5 +298,5 @@ import fetch from "isomorphic-unfetch";
 ### 6. Authentication & middleware in next.js
 
 ```node
-npm install bcrypt jsonwebtoken && install --save-dev @types/bycrypt
+npm install bcrypt jsonwebtoken && install --save-dev @types/bycrypt @types/jsonwebtoken
 ```
