@@ -58,3 +58,40 @@ you can find the distributed app [here]()
       ...
   })}
   ```
+
+## getInitialProps
+
+it`s creating properties for rendering a page on the server side, f.e. a async-data-fetch from a database
+
+```js
+export function List({ ownersList }) {
+  const router = useRouter();
+  return <pre>{JSON.stringify(ownersList, null, 4)}</pre>;
+}
+
+List.getInitialProps = async () => {
+  const response = await fetch("http://localhost:4001/vehicles");
+  const ownersList = await response.json();
+
+  return { ownersList };
+};
+```
+
+dynamic routes used in server-side rendering <br/>
+f.e. http://localhost:3000/car/guy <br/>
+!!! There will be no rerouting until the data is fetched and passed to the List function -> you stay on the site where you navigating from
+
+```js
+...
+List.getInitialProps = async (context) => {
+
+  const { query } = context;
+
+  const response = await fetch(`http://localhost:4001/vehicles?ownername=${query.person}+vehicle=${query.vehicle}`);
+  const ownersList = await response.json();
+
+    return {ownersList}
+}
+```
+
+##
