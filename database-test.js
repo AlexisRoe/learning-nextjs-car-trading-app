@@ -11,12 +11,11 @@ async function openDB() {
 }
 
 async function setup() {
-  try {
-    const db = await openDB();
-    await db.migrate({ force: "last" });
-  } catch (error) {
-    console.error(error.message);
-  }
+  const db = await openDB();
+  await db.migrate({ force: "last" });
+
+  const people = await db.all("SELECT * FROM person");
+  console.log({ type: "ALL PEOPLE", result: JSON.stringify(people) });
 }
 
 setup();

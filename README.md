@@ -203,7 +203,7 @@ response.json({ byID: request.query.id });
 
 because the tutorial seems to use outdated sqlite code you have to change the code in the database-test.js file to the following
 
-from
+database-test.js - from:
 
 ```js
 const sqlite = require("sqlite");
@@ -220,7 +220,7 @@ async function setup() {
 setup();
 ```
 
-to
+database-test.js - to:
 
 ```js
 const sqlite3 = require("sqlite3");
@@ -234,13 +234,52 @@ async function openDB() {
 }
 
 async function setup() {
-  try {
-    const db = await openDB();
-    await db.migrate({ force: "last" });
-  } catch (error) {
-    console.error(error.message);
-  }
+  const db = await openDB();
+  await db.migrate({ force: "last" });
+
+  const people = await db.all("SELECT * FROM person");
+  console.log({ type: "ALL PEOPLE", result: JSON.stringify(people) });
 }
 
 setup();
+```
+
+## creating a sqlite database
+
+1. install dependencies
+
+```node
+npm install sqlite
+npm install sqlite3
+npm install @types/sqlite3
+```
+
+2. creating a folder "migrations"
+3. writing the sql code to setup the "database" (see above, database-test.js)
+4. write a node js script to build and test the database
+
+post method in a route
+
+```ts
+...
+
+if (request.method === "PUT") {
+  const statement = await db.prepare("UPDATE person SET name=?, email=? where id=?);
+  const result = await statement.run(request.body.name, request.body.email, request.body.id);
+  result.finalize();
+}
+
+...
+```
+
+because the sqlite using the third iteration the tutorial code changes to:
+
+```ts
+const db = await sqlite.open({
+  filename: "./mydb.sqlite",
+  driver: sqlite3.Database,
+});
+const people = await db.all("select * from person");
+
+response.json(people);
 ```
