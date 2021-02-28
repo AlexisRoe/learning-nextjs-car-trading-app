@@ -143,16 +143,16 @@ export default function List ({ownersList}: ListProps) {
 
 // defines the response object
 export interface VehiclePerson {
-  details: string;
-  ownerName: string;
-  vehicle: string;
+  details: string,
+  ownerName: string,
+  vehicle: string,
 }
 
 // specify more precise the query property of the build in NextJS
 export interface MyNextPageContext extends NextPageContent {
   query: {
-    person: string;
-    vehicle: string;
+    person: string,
+    vehicle: string,
   }
 }
 
@@ -170,3 +170,31 @@ List.getInitialProps = async (context: MyNextPageContext) => {
 ```
 
 ## api routes / sql query
+
+creating api routes work the same like regular page routings
+
+```ts
+// importing nextjs types for request/ response
+import { NextApiRequest, NextApiResponse } from "next";
+
+// default is needed ti work correct
+export default function getAllVehicles(
+  request: NextApiRequest,
+  response: NextApiResponse
+) {
+  // to check the correct api http method, you have to do it manually & deny everything else
+  if (request.method !== "GET") {
+    response
+      .status(500)
+      .json({ code: 500, message: "wrong http request method" });
+  }
+
+  response.json({ hello: "world", method: request.method });
+}
+```
+
+you can use the query in the api routing like in pages
+
+```ts
+response.json({ byID: request.query.id });
+```
