@@ -198,3 +198,49 @@ you can use the query in the api routing like in pages
 ```ts
 response.json({ byID: request.query.id });
 ```
+
+## !!! SITENOTE !!!
+
+because the tutorial seems to use outdated sqlite code you have to change the code in the database-test.js file to the following
+
+from
+
+```js
+const sqlite = require("sqlite");
+
+async function setup() {
+  try {
+    const db = await sqlite.open("./mydb.sqlite");
+    await db.migrate({ force: "last" });
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+setup();
+```
+
+to
+
+```js
+const sqlite3 = require("sqlite3");
+const { open } = require("sqlite");
+
+async function openDB() {
+  return open({
+    filename: "./mydb.sqlite",
+    driver: sqlite3.Database,
+  });
+}
+
+async function setup() {
+  try {
+    const db = await openDB();
+    await db.migrate({ force: "last" });
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+setup();
+```
