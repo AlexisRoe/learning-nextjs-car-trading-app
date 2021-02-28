@@ -266,7 +266,7 @@ post method in a route
 ...
 
 if (request.method === "PUT") {
-  const statement = await db.prepare("UPDATE person SET name=?, email=? where id=?);
+  const statement = await db.prepare("UPDATE person SET name=?, email=? where id=?");
   const result = await statement.run(request.body.name, request.body.email, request.body.id);
   result.finalize();
 }
@@ -297,6 +297,34 @@ import fetch from "isomorphic-unfetch";
 
 ### 6. Authentication & middleware in next.js
 
+sources:
+
+- [bcrypt](https://www.npmjs.com/package/bcrypt)
+- [bcrypt types](https://www.npmjs.com/package/@types/bcrypt)
+- [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
+- [jsonwebtoken types](https://www.npmjs.com/package/@types/jsonwebtoken)
+
 ```node
 npm install bcrypt jsonwebtoken && install --save-dev @types/bycrypt @types/jsonwebtoken
+```
+
+middleware is explicite used by the developer in every route 🥲
+
+```ts
+import { NextApiRequest, NextApiResponse, NextApiHandler } from "next";
+...
+// authentication middleware
+export const authenticated = (fn: NextApiHandler) => async (
+    req: NextApiRequest,
+    res: NextApiResponse
+) => {
+    // if the JWT is offered and correct, the next function will be called = next in express.js
+    verify(req.headers.authorization, "JWT_SECRET", async function(err, decoded) {
+        if (!err && decoded) {
+            return await fn(req, res);
+        }
+        res.status(500).json({code: 500, message: "Authentication failed"})
+    })
+
+}
 ```
