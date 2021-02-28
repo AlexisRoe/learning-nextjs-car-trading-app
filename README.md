@@ -87,7 +87,7 @@ f.e. http://localhost:3000/car/guy <br/>
 
 export default function List ({ownersList}) {
  return (
-  {ownerslist.map(owner => {
+  {ownersList.map(owner => {
     ...
   })}
  )
@@ -107,7 +107,7 @@ List.getInitialProps = async (context) => {
 
 ### 3. typescript conversion
 
-shortform of using undefined, some shortcuts using ? or type-definition
+short form of using undefined, some shortcuts using ? or type-definition
 
 ```ts
 interface Person {
@@ -122,22 +122,22 @@ interface Person {
 
 or;
 
-type PersonUndefinded = AnotherPerson | undefined;
+type PersonUndefined = AnotherPerson | undefined;
 
 interface Person {
-  name: PersonUndefinded;
+  name: PersonUndefined;
 }
 ```
 
 ```ts
 // defines the properties of the passed object
 export interface ListProps {
-  ownsersList: VerhiclePerson [] | undefined
+  ownersList: VehiclePerson [] | undefined
 }
 
 export default function List ({ownersList}: ListProps) {
  return (
-  {ownerslist?.map(owner => {
+  {ownersList?.map(owner => {
     ...
   })}
  )
@@ -164,8 +164,8 @@ List.getInitialProps = async (context: MyNextPageContext) => {
   const { query } = context;
 
   const response = await fetch(`http://localhost:4001/vehicles?ownername=${query.person}+vehicle=${query.vehicle}`);
-  // because it's async code, it have to provide the return object and undefined (because we didnt know for sure)
-  const ownersList: VehiclePerson[] | undefinded = await response.json();
+  // because it's async code, it have to provide the return object and undefined (because we didn't know for sure)
+  const ownersList: VehiclePerson[] | undefined = await response.json();
 
     return {ownersList}
 }
@@ -176,7 +176,7 @@ List.getInitialProps = async (context: MyNextPageContext) => {
 creating api routes work the same like regular page routings
 
 ```ts
-// importing nextjs types for request/ response
+// importing next.js types for request/ response
 import { NextApiRequest, NextApiResponse } from "next";
 
 // default is needed ti work correct
@@ -201,7 +201,7 @@ you can use the query in the api routing like in pages
 response.json({ byID: request.query.id });
 ```
 
-### 4.1. !!! SITENOTE !!!
+### 4.1. !!! SITE NOTE !!!
 
 because the tutorial seems to use outdated sqlite code you have to change the code in the database-test.js file to the following
 
@@ -305,10 +305,10 @@ sources:
 - [jsonwebtoken types](https://www.npmjs.com/package/@types/jsonwebtoken)
 
 ```node
-npm install bcrypt jsonwebtoken && install --save-dev @types/bycrypt @types/jsonwebtoken
+npm install bcrypt jsonwebtoken && install --save-dev @types/bcrypt @types/jsonwebtoken
 ```
 
-middleware is explicite used by the developer in every route 🥲
+middleware is explicit used by the developer in every route 🥲
 
 ```ts
 import { NextApiRequest, NextApiResponse, NextApiHandler } from "next";
@@ -327,4 +327,12 @@ export const authenticated = (fn: NextApiHandler) => async (
     })
 
 }
+```
+
+### 7. Consume protected API Routes
+
+first install the necessary packages
+
+```node
+npm install cookie && npm install --save-dev @types/cookie
 ```
