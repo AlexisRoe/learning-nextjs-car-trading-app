@@ -82,7 +82,16 @@ f.e. http://localhost:3000/car/guy <br/>
 !!! There will be no rerouting until the data is fetched and passed to the List function -> you stay on the site where you navigating from
 
 ```js
-...
+
+export default function List ({ownersList}) {
+ return (
+  {ownerslist.map(owner => {
+    ...
+  })}
+ )
+}
+
+
 List.getInitialProps = async (context) => {
 
   const { query } = context;
@@ -94,4 +103,70 @@ List.getInitialProps = async (context) => {
 }
 ```
 
-##
+## typescript conversion
+
+shortform of using undefined, some shortcuts using ? or type-definition
+
+```ts
+interface Person {
+  name: AnotherPerson | undefined;
+}
+
+or;
+
+interface Person {
+  name?: AnotherPerson;
+}
+
+or;
+
+type PersonUndefinded = AnotherPerson | undefined;
+
+interface Person {
+  name: PersonUndefinded;
+}
+```
+
+```ts
+// defines the properties of the passed object
+export interface ListProps {
+  ownsersList: VerhiclePerson [] | undefined
+}
+
+export default function List ({ownersList}: ListProps) {
+ return (
+  {ownerslist?.map(owner => {
+    ...
+  })}
+ )
+}
+
+// defines the response object
+export interface VehiclePerson {
+  details: string;
+  ownerName: string;
+  vehicle: string;
+}
+
+// specify more precise the query property of the build in NextJS
+export interface MyNextPageContext extends NextPageContent {
+  query: {
+    person: string;
+    vehicle: string;
+  }
+}
+
+
+List.getInitialProps = async (context: MyNextPageContext) => {
+
+  const { query } = context;
+
+  const response = await fetch(`http://localhost:4001/vehicles?ownername=${query.person}+vehicle=${query.vehicle}`);
+  // because it's async code, it have to provide the return object and undefined (because we didnt know for sure)
+  const ownersList: VehiclePerson[] | undefinded = await response.json();
+
+    return {ownersList}
+}
+```
+
+## api routes / sql query
