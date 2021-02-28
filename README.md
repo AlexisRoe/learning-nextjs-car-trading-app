@@ -4,62 +4,64 @@ in this repo I follow the tutorial by [Bruno Antunes](https://www.youtube.com/ch
 
 you can find the distributed app [here]()
 
-## Routing in Next.js
+## my learnings through the tutorial
 
-- static routes are automatically included by creating folders and files in the page folder
+### Routing in Next.js
 
-        pages/vehicle/opel.js --> http://localhost:3000/vehicle/opel
+static routes are automatically included by creating folders and files in the page folder
 
-- dynamic routes can be created by simply close the name in [] brackets
+    pages/vehicle/opel.js --> http://localhost:3000/vehicle/opel
 
-        pages/[vehicle]/[type] --> this creates two variables "vehicle" & "type"
+dynamic routes can be created by simply close the name in [] brackets
 
-- reading it in the function works like that
+    pages/[vehicle]/[type] --> this creates two variables "vehicle" & "type"
 
-  ```js
-  import { useRouter } from "next/router";
+reading it in the function works like that
 
-  export default function Person() {
-    const router = useRouter();
-    return (
-      <h2>
-        {router.query.person}´s {router.query.vehicle}
-      </h2>
-    );
-  }
-  ```
+```js
+import { useRouter } from "next/router";
 
-- links are build like that, even dynamically
+export default function Person() {
+  const router = useRouter();
+  return (
+    <h2>
+      {router.query.person}´s {router.query.vehicle}
+    </h2>
+  );
+}
+```
 
-  ```js
-  import Link from "next/link";
+links are build like that, even dynamically
 
-  export default function Details() {
-    return (
-      <div>
-        <Link as="/car/bruno" href="/[vehicle]/[person]">
-          <a>Details: Bruno`car</a>
-        </Link>
-      </div>
-    );
-  }
-  ```
+```js
+import Link from "next/link";
 
-  ```js
-  ...
-  const peoples = [
-      {vehicle: "car1", person: "person1"},
-      {vehicle: "car2", person: "person2"},
-      {vehicle: "car3", person: "person3"},
-  ]
-  ...
-  {peoples.map(people => {
-      <Link as={`/${people.vehicle}/${people.person}`} href="/[vehicle]/[person]">
-      ...
-  })}
-  ```
+export default function Details() {
+  return (
+    <div>
+      <Link as="/car/bruno" href="/[vehicle]/[person]">
+        <a>Details: Bruno`car</a>
+      </Link>
+    </div>
+  );
+}
+```
 
-## getInitialProps
+```js
+...
+const peoples = [
+    {vehicle: "car1", person: "person1"},
+    {vehicle: "car2", person: "person2"},
+    {vehicle: "car3", person: "person3"},
+]
+...
+{peoples.map(people => {
+    <Link as={`/${people.vehicle}/${people.person}`} href="/[vehicle]/[person]">
+    ...
+})}
+```
+
+### 2. getInitialProps
 
 it`s creating properties for rendering a page on the server side, f.e. a async-data-fetch from a database
 
@@ -103,7 +105,7 @@ List.getInitialProps = async (context) => {
 }
 ```
 
-## typescript conversion
+### 3. typescript conversion
 
 shortform of using undefined, some shortcuts using ? or type-definition
 
@@ -169,7 +171,7 @@ List.getInitialProps = async (context: MyNextPageContext) => {
 }
 ```
 
-## api routes / sql query
+### 4. api routes / sql query
 
 creating api routes work the same like regular page routings
 
@@ -199,7 +201,7 @@ you can use the query in the api routing like in pages
 response.json({ byID: request.query.id });
 ```
 
-## !!! SITENOTE !!!
+### 4.1. !!! SITENOTE !!!
 
 because the tutorial seems to use outdated sqlite code you have to change the code in the database-test.js file to the following
 
@@ -244,15 +246,15 @@ async function setup() {
 setup();
 ```
 
-## creating a sqlite database
+### 4.2. creating a sqlite database
 
 1. install dependencies
 
-```node
-npm install sqlite
-npm install sqlite3
-npm install @types/sqlite3
-```
+   ```node
+   npm install sqlite
+   npm install sqlite3
+   npm install @types/sqlite3
+   ```
 
 2. creating a folder "migrations"
 3. writing the sql code to setup the "database" (see above, database-test.js)
@@ -283,3 +285,5 @@ const people = await db.all("select * from person");
 
 response.json(people);
 ```
+
+### 5. Material UI
