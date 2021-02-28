@@ -287,3 +287,16 @@ response.json(people);
 ```
 
 ### 5. Material UI
+
+recommended way to use fetch server-side and client-side
+
+```js
+import fetch from "isomorphic-unfetch";
+...
+```
+
+### 6. Authentication & middleware in next.js
+
+```node
+npm install bcrypt jsonwebtoken && install --save-dev @types/bycrypt
+```
