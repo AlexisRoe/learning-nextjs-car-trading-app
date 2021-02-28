@@ -336,3 +336,20 @@ first install the necessary packages
 ```node
 npm install cookie && npm install --save-dev @types/cookie
 ```
+
+setting secure cookie with JWT as the payload
+
+```ts
+response.setHeader(
+  "Set-Cookie",
+  cookie.serialize("auth", jwt, {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV !== "production" ? false : true,
+    secure: process.env.NODE_ENV !== "development",
+    sameSite: "strict",
+    maxAge: 3600,
+    // root of the domain
+    path: "/",
+  })
+);
+```

@@ -3,6 +3,7 @@ import sqlite from "sqlite";
 import sqlite3 from "sqlite3";
 import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
+import cookie from "cookie";
 
 export default async function login(request, response) {
   const db = await sqlite.open({
@@ -16,7 +17,7 @@ export default async function login(request, response) {
       request.body.email,
     ]);
 
-    // TODO: response if the user doesnt exists or cant be found
+    // TODO: response if the user doesn't exists or cant be found
     // ...
 
     // compare the stored password with the offered once
@@ -28,10 +29,22 @@ export default async function login(request, response) {
           myPersonName: person.name,
           myPersonMail: person.email,
         };
-        // of course the JWT_SECRET should be stored in enviremental variable
+        // of course the JWT_SECRET should be stored in environmental variable
         const jwt = sign(claims, "JWT_SECRET", { expiresIn: "1h" });
 
-        response.json({ code: 200, authToken: jwt });
+        response.setHeader(
+          "Set-Cookie",
+          cookie.serialize("auth", jwt, {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV !== "production" ? false : true,
+            secure: process.env.NODE_ENV !== "development",
+            sameSite: "strict",
+            maxAge: 3600,
+            // root of the domain
+            path: "/",
+          })
+        );
+        response.json({ code: 200, message: "authenticated" });
       } else {
         response.json({ code: 400, message: "not ok" });
       }

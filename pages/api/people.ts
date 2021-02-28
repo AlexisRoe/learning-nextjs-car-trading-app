@@ -1,25 +1,7 @@
-import { NextApiRequest, NextApiResponse, NextApiHandler } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import sqlite from "sqlite";
 import sqlite3 from "sqlite3";
-import { verify } from "jsonwebtoken";
-
-// authentication middleware
-export const authenticated = (fn: NextApiHandler) => async (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => {
-  // if the JWT is offered and correct, the next function will be called = next in express.js
-  verify(
-    req.headers.authorization,
-    "JWT_SECRET",
-    async function (err, decoded) {
-      if (!err && decoded) {
-        return await fn(req, res);
-      }
-      res.status(500).json({ code: 500, message: "Authentication failed" });
-    }
-  );
-};
+import { authenticated } from "./authenticated_middleware";
 
 export default authenticated(async function getPeople(
   req: NextApiRequest,

@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import sqlite from "sqlite";
 import sqlite3 from "sqlite3";
-
-// import the authentication middleware
-import { authenticated } from "./people";
+import { authenticated } from "./authenticated_middleware";
 
 // default is needed to work correct
 export default authenticated(async function getAllVehicles(
