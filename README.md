@@ -833,3 +833,79 @@ export default MyApp;
 ```
 
 ### 10. env and runtime config
+
+injecting environment variables on build time and make it available to the client-side, you can find the documentation: [here](https://nextjs.org/docs/api-reference/next.config.js/runtime-configuration)
+
+next.config.js
+
+```js
+module.exports = {
+  env: {
+    MY_STEP: process.env.MY_STEP,
+  },
+  serverRuntimeConfig: {
+    // Will only be available on the server side
+    mySecret: "secret",
+    secondSecret: process.env.SECOND_SECRET, // Pass through env variables
+  },
+  publicRuntimeConfig: {
+    // Will be available on both server and client
+    API_ENDPOINT: "/api/helloGuys",
+  },
+};
+```
+
+using it in a page like that
+
+```js
+// server-side rendered
+// access the configuration and inject the environmental variables
+import getConfig from "next/config";
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const MYSECRET = serverRuntimeConfig.MY_SECRET;
+const APIENDPOINT = publicRuntimeConfig.API_ENDPOINT;
+
+console.log(MYSECRET); // will not display on the client-side
+console.log(APIENDPOINT); // will be visible on the client-side
+
+export default function Gssp(props) {
+  return (
+    <>
+      {/* will not display on the client-side  */}
+      <div>MY_SECRET: {MYSECRET}</div>
+      {/* will be visible on the client-side   */}
+      <div>API_ENDPOINT: {APIENDPOINT}</div>
+      {/* MY_SECRET will be displayed because it was injected in the component props  */}
+      <div>{JSON.stringify(props, null, 4)}</div>
+    </>
+  );
+}
+
+export const getServerSideProps = () => {
+  return {
+    props: {
+      // injecting server-variable in the client-component and expose it the user
+      MY_SECRET: MYSECRET,
+      API_ENDPOINT: APIENDPOINT,
+    },
+  };
+};
+```
+
+to use your own environmental variables on your local machine you have to use [packages like dotenv](https://www.npmjs.com/package/dotenv)
+
+```node
+npm install dotenv
+```
+
+putting it into the next.config.js file
+
+```js
+require("dotenv").config();
+
+module.exports = {
+  env: {
+    MY_STEP: process.env.MY_STEP,
+  },
+...
+```
