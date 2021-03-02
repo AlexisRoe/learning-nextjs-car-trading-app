@@ -6,8 +6,8 @@ you can find the distributed app [here]() - (coming soon)
 
 **There are two branches**
 
-1. [main branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/main) = basic next.js Tutorial
-2. [trading branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/trading) = contains the tutorial for the car trading app based on the first tutorial in the main branch (coming soon)
+1. [main branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/main) = basic next.js Tutorial, based on [my next.js-starter-template](https://github.com/AlexisRoe/next.js-template) (which is based on the [nextjs-starter](https://github.com/lmachens/next.js-template) by [lmachens](@lmachens))
+2. [trading branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/trading) = contains the tutorial for the car trading app based on the code [here](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-1) (coming soon)
 
 ## Topics
 
@@ -21,6 +21,7 @@ you can find the distributed app [here]() - (coming soon)
 - [6. Authentication & middleware in next.js](#6.-Authentication-&-middleware-in-next.js)
 - [7. Consume protected API Routes](#7.-Consume-protected-API-Routes)
 - [8. getStaticProps and getStaticPath](#8.-getStaticProps-and-getStaticPath)
+- [9. DataFetching with getServerSideProps](#9.-DataFetching-with-getServerSideProps)
 
 ## Github Sources
 
@@ -738,4 +739,94 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
+```
+
+### 9. DataFetching with getServerSideProps
+
+only runs on the server-side, on every client-side call of a page / with getInitialProps it will run on client and on server-side
+
+the difference between them is only in the way the data are passed to the page component. But you can avoid using an api, and call the databases yourself
+
+```js
+export const getServerSideProps = async (context) => {
+  const db = openDB();
+  const people = await db.all("SELECT * FROM people");
+
+  return { props: { people } };
+};
+
+export const getInitialProps = async (context) => {
+  const response = await fetch("https://app.com/api/people");
+  const people = await res.json();
+
+  return { people };
+};
+```
+
+an example implementation
+
+```tsx
+import { GetServerSideProps } from "next";
+import { Microphone } from "../model/Microphones";
+import { openDB } from "../utils/openDB";
+
+export interface IndexProps {
+  microphones: Microphone[];
+}
+
+const Index = ({ microphones }: IndexProps) => {
+  return <pre>{JSON.stringify(microphones, null, 4)}</pre>;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const db = await openDB();
+  const microphones = await db.all<Microphone[]>("SELECT * FROM microphone");
+
+  return { props: { microphones } };
+};
+
+export default Index;
+```
+
+the only problem is, that there will be no navigation before the request is finished. One possible Solution is to show the user that something happens, and when all data is there, creates the new page...
+
+nprogress
+
+```node
+npm install nprogress
+```
+
+implementation on every page of the application in \_app.js
+
+```js
+import "../styles/globals.css";
+import { AppProps } from "next/app";
+import { Router } from "next/router";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+
+// shut off a spinner on the right side
+NProgress.configure({ showSpinner: false });
+
+// triggers when a link is clicked
+Router.events.on("routeChangeStart", () => {
+  NProgress.start();
+});
+
+// triggers when all requests finished and the side is rendered
+Router.events.on("routeChangeComplete", () => {
+  NProgress.done();
+});
+
+// if something goes wrong
+Router.events.on("routeChangeError", () => {
+  NProgress.done();
+});
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />;
+}
+
+export default MyApp;
 ```
