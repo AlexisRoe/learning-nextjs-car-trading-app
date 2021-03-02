@@ -2,11 +2,48 @@
 
 in this repo I follow the tutorial by [Bruno Antunes](https://www.youtube.com/channel/UCyU0mNYdX9EHY7rc5yucIZA) The video course you can find [here](https://www.youtube.com/playlist?list=PLYSZyzpwBEWSQsrukurP09ksi49H9Yj40). In the end there will be a car trading app, showing all the features of the tutorial. Afterwards you find my learnings.
 
-you can find the distributed app [here]()
+you can find the distributed app [here]() - (coming soon)
+
+**There are two branches**
+
+1. [main branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/main) = basic next.js Tutorial
+2. [trading branch](https://github.com/AlexisRoe/learning-nextjs-car-trading-app/blob/trading) = contains the tutorial for the car trading app based on the first tutorial in the main branch (coming soon)
+
+## Topics
+
+- [1. Routing in Next.js](#1.-Routing-in-Next.js)
+- [2. getInitialProps](#2.-getInitialProps)
+- [3. typescript conversion](#3.-typescript-conversion)
+- [4. api routes and sql query](#4.-api-routes-and-sql-query)
+- [4.1. SITE NOTE](#4.1.-SITE-NOTE)
+- [4.2. creating a sqlite database](#4.2.-creating-a-sqlite-database)
+- [5. Material UI](#5.-Material-UI)
+- [6. Authentication & middleware in next.js](#6.-Authentication-&-middleware-in-next.js)
+- [7. Consume protected API Routes](#7.-Consume-protected-API-Routes)
+- [8. getStaticProps and getStaticPath](#8.-getStaticProps-and-getStaticPath)
+
+## Github Sources
+
+- [Basic Tutorial - Part 1](https://github.com/bmvantunes/youtube-2020-feb-nextjs-part1);
+- [Basic Tutorial - Part 2](https://github.com/bmvantunes/youtube-2020-feb-nextjs-part2);
+- [Basic Tutorial - Part 3](https://github.com/bmvantunes/youtube-2020-march-nextjs-part3);
+- [Basic Tutorial - Part 4](https://github.com/bmvantunes/youtube-2020-march-nextjs-part4);
+- [Basic Tutorial - Part 5](https://github.com/bmvantunes/youtube-2020-march-nextjs-part5);
+- [Basic Tutorial - Part 6](https://github.com/bmvantunes/youtube-2020-march-nextjs-part6);
+- [Basic Tutorial - Part 7](https://github.com/bmvantunes/youtube-2020-march-nextjs-part7);
+- [Basic Tutorial - Part 8](https://github.com/bmvantunes/youtube-2020-april-nextjs-part8);
+- [Basic Tutorial - Part 9](https://github.com/bmvantunes/youtube-2020-april-nextjs-part9);
+- [Basic Tutorial - Part 10](https://github.com/bmvantunes/youtube-2020-april-nextjs-part10);
+- [Car Trading App - Part 1](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-1)
+- [Car Trading App - Part 2](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-2)
+- [Car Trading App - Part 3](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-3)
+- [Car Trading App - Part 4](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-4)
+- [Car Trading App - Part 5](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-5)
+- [Car Trading App - Part 6](https://github.com/bmvantunes/youtube-2020-may-building-a-car-trader-app-6)
 
 ## my learnings through the tutorial
 
-### Routing in Next.js
+### 1. Routing in Next.js
 
 static routes are automatically included by creating folders and files in the page folder
 
@@ -171,7 +208,7 @@ List.getInitialProps = async (context: MyNextPageContext) => {
 }
 ```
 
-### 4. api routes / sql query
+### 4. api routes and sql query
 
 creating api routes work the same like regular page routings
 
@@ -201,7 +238,7 @@ you can use the query in the api routing like in pages
 response.json({ byID: request.query.id });
 ```
 
-### 4.1. !!! SITE NOTE !!!
+### 4.1. SITE NOTE
 
 because the tutorial seems to use outdated sqlite code you have to change the code in the database-test.js file to the following
 
@@ -248,6 +285,8 @@ setup();
 
 ### 4.2. creating a sqlite database
 
+You can find the documentation: [here](https://sqlite.org/index.html)
+
 1. install dependencies
 
    ```node
@@ -288,11 +327,159 @@ response.json(people);
 
 ### 5. Material UI
 
-recommended way to use fetch server-side and client-side
+You can find the documentation: [here](https://material-ui.com/)
+
+```node
+npm install @material-ui/core @material-ui/icons
+```
+
+you have to create three files in the page directory
+
+- \_app.js
+- \_document.js
+- theme.js
+
+basic setup in \_app.js
 
 ```js
-import fetch from "isomorphic-unfetch";
-...
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider } from "@material-ui/core/styles";
+import App from "next/app";
+import Head from "next/head";
+import React from "react";
+import theme from "./theme";
+
+export default class MyApp extends App {
+  componentDidMount() {
+    // Remove the server-side injected CSS.
+    const jssStyles = document.querySelector("#jss-server-side");
+    if (jssStyles) {
+      jssStyles.parentElement.removeChild(jssStyles);
+    }
+  }
+
+  render() {
+    const { Component, pageProps } = this.props;
+
+    return (
+      <React.Fragment>
+        <Head>
+          <title>My page</title>
+          <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width"
+          />
+        </Head>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </React.Fragment>
+    );
+  }
+}
+```
+
+basic theming (default settings) in theme.js
+
+```js
+import { red } from "@material-ui/core/colors";
+import { createMuiTheme } from "@material-ui/core/styles";
+
+// Create a theme instance.
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#556cd6",
+    },
+    secondary: {
+      main: "#19857b",
+    },
+    error: {
+      main: red.A400,
+    },
+    background: {
+      default: "red",
+    },
+  },
+});
+
+export default theme;
+```
+
+basic setup \_document.js
+
+```js
+import { ServerStyleSheets } from "@material-ui/core/styles";
+import Document, { Head, Main, NextScript } from "next/document";
+import React from "react";
+import theme from "./theme";
+
+export default class MyDocument extends Document {
+  render() {
+    return (
+      <html lang="en">
+        <Head>
+          {/* PWA primary color */}
+          <meta name="theme-color" content={theme.palette.primary.main} />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          />
+        </Head>
+        <body>
+          <Main />
+          <NextScript />
+        </body>
+      </html>
+    );
+  }
+}
+
+MyDocument.getInitialProps = async (ctx) => {
+  // Resolution order
+  //
+  // On the server:
+  // 1. app.getInitialProps
+  // 2. page.getInitialProps
+  // 3. document.getInitialProps
+  // 4. app.render
+  // 5. page.render
+  // 6. document.render
+  //
+  // On the server with error:
+  // 1. document.getInitialProps
+  // 2. app.render
+  // 3. page.render
+  // 4. document.render
+  //
+  // On the client
+  // 1. app.getInitialProps
+  // 2. page.getInitialProps
+  // 3. app.render
+  // 4. page.render
+
+  // Render app and page and get the context of the page with collected side effects.
+  const sheets = new ServerStyleSheets();
+  const originalRenderPage = ctx.renderPage;
+
+  ctx.renderPage = () =>
+    originalRenderPage({
+      enhanceApp: (App) => (props) => sheets.collect(<App {...props} />),
+    });
+
+  const initialProps = await Document.getInitialProps(ctx);
+
+  return {
+    ...initialProps,
+    // Styles fragment is rendered after the app and page rendering finish.
+    styles: [
+      ...React.Children.toArray(initialProps.styles),
+      sheets.getStyleElement(),
+    ],
+  };
+};
 ```
 
 ### 6. Authentication & middleware in next.js
@@ -401,4 +588,154 @@ People.getInitialProps = async (context: NextPageContext) => {
 };
 
 export default People;
+```
+
+### 8. getStaticProps and getStaticPath
+
+**Explanation:**
+
+1. on build time, next.js will open the file, f.e. [id].tsx
+2. first it will create the available paths, in this case for the id of 6/7/8, nothing else
+3. this id's will be passed to getStaticProps and create the properties from the database
+4. for each id, props will be created and passed to the jsx function and render the file
+
+- so when someone call the path .../microphone/6 -> there will be a already rendered file
+- for any other id, except 6/7/8, there will be no file, and 404 will be displayed
+
+- for a specific amount of files, they can be build ahead, f.e. the 10 most bought items in a shop, this buys time and reduce the server stress
+
+simple way of creating a database based on migration table
+
+```js
+const sqlite = require("sqlite");
+const sqlite3 = require("sqlite3");
+
+// instantly invoked function call
+(async () => {
+  const db = await sqlite.open({
+    filename: "./microphone.sqlite",
+    driver: sqlite3.Database,
+  });
+
+  await db.migrate({ force: true });
+  const microphones = await db.all("select * from microphone");
+  console.log(JSON.stringify(microphones, null, 4));
+})();
+```
+
+creating a model for the microphone object
+
+```ts
+export interface Microphone {
+  id: number;
+  brand: string;
+  model: string;
+  price: number;
+  imageUrl: string;
+}
+```
+
+finally go to getStaticProps: they only run on the server-side on build-time
+
+```ts
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  const db = await openDB();
+  const microphones = await db.all("select * from microphone");
+
+  return { props: { microphones } };
+};
+```
+
+now there will be creating the getStatic Paths
+
+```ts
+export const getStaticPaths: GetStaticPaths<{id: string}> = async () => {
+
+    return {
+        fallback: false,
+        path: [
+            {params: {id: "6"}}
+            {params: {id: "7"}}
+            {params: {id: "8"}}
+        ]
+    }
+}
+```
+
+if the fallback is true, the not specified id`s will be rendered just-in-time
+
+```ts
+return {
+        fallback: true,
+        path: [
+            {params: {id: "6"}}
+```
+
+this is a way to get the needed id's from a database and create the necessary array
+
+```ts
+export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
+  const db = await openDB();
+  const microphones = await db.all("SELECT * FROM microphone");
+  const paths = microphones.map((microphone) => {
+    return { params: { id: microphone.id.toString() } };
+  });
+
+  return {
+    fallback: true,
+    paths,
+  };
+};
+```
+
+**pagination**
+
+creates only an specific amount (5 in this case) items per page
+
+```ts
+export const getStaticProps: GetStaticProps = async (context) => {
+  const currentPage = context.params?.currentPage as string;
+  const currentPageNumber = (currentPage || 0).toString();
+
+  //
+  const min = currentPageNumber * 5; // because there should be 5 items per page
+  const max = (currentPageNumber + 1) * 5;
+
+  const db = await openDB();
+  const microphones = await db.all(
+    "SELECT * FROM microphones WHERE id > ? AND id < ?",
+    min,
+    max
+  );
+
+  return { props: { microphones } };
+};
+```
+
+creating the paths needed to see all items, f.e. 16 items, you need 4 pages with 5 items each (5,5,5,1)
+
+```tsx
+...
+export default Index;
+export { getStaticProps };
+
+export const getStaticPaths: GetStaticPaths = async () => {
+
+  const db = await openDB();
+  // returns the number of entries in the microphone table
+  const { total } = await db.get("SELECT COUNT(*) AS TOTAL FROM microphone");
+  // round up, to always get pages, even if there is only one item
+  const numberOfPages = Math.ceil(total/5.0);
+
+  // creating an array with the needed Pages to display all items, each entry is an empty string, in the map function the current value is ignored
+  const paths = Array(numberOfPages - 1).fill("").map((_, index) => {
+    return { params: { currentPage: (index + 1).toString() }}
+  })
+
+  return {
+    fallback: false,
+    paths
+  }
+}
+
 ```
