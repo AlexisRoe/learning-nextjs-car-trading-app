@@ -25,6 +25,7 @@ you can find the distributed app [here]() - (coming soon)
 - [10. env and runtime config](#10.-env-and-runtime-config)
 - [image optimization](#image-optimization)
 - [api routes using next-connect](#api-routes-using-next-connect)
+- [changes in the router](#changes-in-the-router)
 
 ## Github Sources
 
@@ -1112,3 +1113,26 @@ export default nextConnect<NextApiRequest, NextApiResponse>({
   }
 });
 ```
+
+### changes in the router
+
+1. the router is now case-sensitive
+2. the Link component changed, simpler, no pageload
+
+   ```tsx
+   import Link from "next/link";
+
+   export default function Home() {
+     return <Link href="/brazil/guy">Navigate</Link>;
+   }
+   ```
+
+3. make it clear, what a page will be, f.e. index.page.js, that make it more easier to place the unit tests next to it
+
+   next.config.js
+
+   ```js
+   module.exports = {
+     pageExtension: ["page.js", "page.jsx", "page.ts", "page.tsx"],
+   };
+   ```
