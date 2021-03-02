@@ -22,6 +22,7 @@ you can find the distributed app [here]() - (coming soon)
 - [7. Consume protected API Routes](#7.-Consume-protected-API-Routes)
 - [8. getStaticProps and getStaticPath](#8.-getStaticProps-and-getStaticPath)
 - [9. DataFetching with getServerSideProps](#9.-DataFetching-with-getServerSideProps)
+- [10. env and runtime config](#10.-env-and-runtime-config)
 
 ## Github Sources
 
@@ -830,3 +831,5 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 export default MyApp;
 ```
+
+### 10. env and runtime config
