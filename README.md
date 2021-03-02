@@ -23,6 +23,8 @@ you can find the distributed app [here]() - (coming soon)
 - [8. getStaticProps and getStaticPath](#8.-getStaticProps-and-getStaticPath)
 - [9. DataFetching with getServerSideProps](#9.-DataFetching-with-getServerSideProps)
 - [10. env and runtime config](#10.-env-and-runtime-config)
+- [image optimization](#image-optimization)
+- [api routes using next-connect](#api-routes-using-next-connect)
 
 ## Github Sources
 
@@ -908,4 +910,205 @@ module.exports = {
     MY_STEP: process.env.MY_STEP,
   },
 ...
+```
+
+### image optimization
+
+you can find source code: [here](https://github.com/bmvantunes/youtube-2020-dec-nextjs-image-component)<br />
+you can find the video file: [here](https://www.youtube.com/watch?v=R4sdWUI3-mY&list=PLYSZyzpwBEWSQsrukurP09ksi49H9Yj40&index=12)
+
+the tool uses imageSets
+
+```tsx
+export default function SrcSet () {
+  return (
+    <div>
+      <h2>My Image</h2>
+      <img
+        {/* the src specifies the default */}
+        src="/example-red/small-800px.png"
+        {/* the srcSet will be used by the browser to decide which one to load, depending on the screen total viewport width */}
+        srcSet="
+          /example-red/small-800px.png 800w
+          /example-red/medium-1200px.png 1200w
+          /example-red/large-1600px.png 1600w
+        "
+        {/* to use it probably with libraries like Bootstrap, you have to define the view width depending on the img size (breakpoints) */}
+        sizes="(min-width: 767px) 33vw, (min-width: 568px) 50vw, 100vw"
+      />
+    </div>
+  )
+}
+```
+
+[Image component](https://nextjs.org/docs/api-reference/next/image) from next.js (responsive and visible in viewport including a placeholder)
+
+```tsx
+import Image from "next/image";
+
+interface Photo {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+// just for following the tutorial
+const photos: Photo[] = [{ src: "test", width: 200, height: 200, alt: "test" }];
+
+export default function Image() {
+  return (
+    <div>
+      <h2>Image Component</h2>
+      {photos.map((photo) => {
+        <Image
+          alt={photo.alt}
+          src={photo.src}
+          key={photo.src}
+          width={photo.width}
+          height={photo.height}
+          layout="fixed"
+        />;
+      })}
+    </div>
+  );
+}
+```
+
+using it as background-image
+
+```js
+...
+<Image
+  src="..."
+  alt="..."
+  layout="fill"
+  objectFit="cover"
+  objectPosition="bottom center"
+/>
+...
+```
+
+trick to load the last image on a page instantly (f.e. a logo or company slogan)
+
+```js
+photos.map((photo, index) => {
+  ...
+  loading={(photos.length === index + 1) ? "eager" : "lazy"}
+  ...
+})
+```
+
+you can override the default image transformation settings in next.config.js file
+
+```js
+...
+images: {
+    deviceSizes: [640, 750, 1080, 1920, 2048, 2840],
+  },
+...
+```
+
+### api routes using next-connect
+
+you can find the next-connect: [here](https://github.com/hoangvvo/next-connect)
+
+example api call for a GET-method
+
+```ts
+import nextConnect from "next-connect";
+import { openDB } from "../../openDB";
+
+export default nextConnect<NextApiRequest, NextApiResponse>({
+  // option object property, if nothing is found, custom response
+  onNoMatch(req, res, next) {
+    res
+      .status(405)
+      .json({ code: 405, message: `Method ${req.method}not supported` });
+  },
+  // option object property, if something goes wrong, custom response
+  onError(error, req, res) {
+    res.status(500).json({ code: 500, message: `${error.message}` });
+  },
+}).get(async (request, response) => {
+  const db = await openDB();
+  const champions = await db.all(
+    "SELECT * FROM driver WHERE titles > 0 ORDER BY titles DESC, name ASC"
+  );
+  res.status(200).json(champions);
+});
+```
+
+the first part could put outside (file handler.js)
+
+```ts
+export default nextConnect<NextApiRequest, NextApiResponse>({
+  // option object property, if nothing is found, custom response
+  onNoMatch(req, res, next) {
+    res
+      .status(405)
+      .json({ code: 405, message: `Method ${req.method}not supported` });
+  },
+  // option object property, if something goes wrong, custom response
+  onError(error, req, res) {
+    res.status(500).json({ code: 500, message: `${error.message}` });
+  },
+});
+```
+
+importing into another file
+
+```js
+import handler from "../handler"
+...
+export default handler.get(
+  async (request, response) => {
+    const db = await openDB();
+    const champions = await db.all(
+      "SELECT * FROM driver WHERE titles > 0 ORDER BY titles DESC, name ASC"
+    );
+    res.status(200).json(champions);
+  }
+);
+```
+
+using a middleware, to verify a JWT Token and authorize the route
+
+```ts
+export interface NextApiRequestExtended extends NextApiRequest {
+  userID: number | null;
+  userName: string | null;
+}
+
+export default nextConnect<NextApiRequest, NextApiResponse>({
+  onNoMatch(req, res) {
+    res
+      .status(405)
+      .json({ code: 405, message: `Method ${req.method}not supported` });
+  },
+  onError(error, res) {
+    res.status(500).json({ code: 500, message: `${error.message}` });
+  },
+}).use((req, res, next) => {
+  req.userID = null;
+  req.userName = null;
+
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+    next();
+  } else {
+    verify(
+      authorization,
+      process.env.JWT_SECRET,
+      (error: any, decoded: any) => {
+        if (!error && decoded) {
+          req.userId = decoded.userID;
+          req.userName = decoded.userName;
+        }
+        next();
+      }
+    );
+  }
+});
 ```
